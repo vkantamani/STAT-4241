@@ -1,0 +1,60 @@
+---
+title: "Model Evaluation"
+author: "Vivek Kantamani (vk2389)"
+geometry: margin = 1.25cm
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+fontsize: 10.5pt
+---
+
+Our function which wraps our final model, takes gene expression levels as input, and returns the prediction of patients' status is provided below.  
+Please ensure that the (1) test data set, and (2) file `final_model.RDS` exist in the same directory as this RMD file.  
+Please insert the name of the test data set to be assigned to the object `test_data`.  
+
+```{r}
+# PLEASE INSERT TEST DATA SET NAME HERE
+# REPLACE "breast_cancer_test.csv" WITH THE NAME OF THE TEST DATA SET
+test_file = "breast_cancer_test.csv"
+
+library(e1071)
+
+# Function argument is the test data set
+model_function = function(test_file) {
+  
+  # Read in test data set
+  test_data = read.csv(test_file)
+  
+  # Load final model using readRDS()
+  final_model = readRDS(file = "final_model.RDS")
+  
+  # Predict the class labels for the test data set
+  pred = predict(final_model, test_data)
+  
+  # Return the prediction of patients' status
+  return(pred)
+}
+
+prediction = model_function(test_file)
+
+paste("The predictions of patients' status is as follows.")
+prediction
+```
+
+If the test data set is normalized, filtered, and labeled similarly to the training data set, then the following code will produce a confusion matrix and determine the test error of the model applied to the test data set.  
+
+```{r}
+# Read in test data set
+test = read.csv(test_file)
+
+# Produce a confusion matrix 
+confusion_matrix = table(prediction, test$status)
+paste("A confusion matrix of the results of the model on the test data set is as follows.")
+confusion_matrix
+
+# Calculate the test error of the model
+error = mean(prediction != test$status)
+paste("The test error is ", error,
+      sep = "")
+```
